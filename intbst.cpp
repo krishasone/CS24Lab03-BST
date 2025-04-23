@@ -31,6 +31,7 @@ void IntBST::clear(Node *n) {
 bool IntBST::insert(int value) {
     if (root == nullptr) {
         root = new Node(value);
+        root->parent = nullptr;
         return true;
     }
     else {
@@ -46,6 +47,7 @@ bool IntBST::insert(int value, Node *n) {
     if (value < n->info) {
         if (n->left == nullptr){
             n->left = new Node(value);
+            n->left->parent = n;
             return true;
         }
         else {
@@ -55,6 +57,7 @@ bool IntBST::insert(int value, Node *n) {
     else {
         if (n->right == nullptr) {
             n->right = new Node(value);
+            n->right->parent = n;
             return true;
         }
         else {
@@ -107,7 +110,7 @@ void IntBST::printPostOrder(Node *n) const {
 
 // return sum of values in tree
 int IntBST::sum() const {
-    return sum (root);
+    return sum(root);
 }
 
 // recursive helper for sum
@@ -173,26 +176,113 @@ bool IntBST::contains(int value) const {
 
 // returns the Node containing the predecessor of the given value
 IntBST::Node* IntBST::getPredecessorNode(int value) const{
-    return NULL; // REPLACE THIS NON-SOLUTION
+    Node* curr = getNodeFor(value, root);
+    if (curr == nullptr) {
+        return nullptr;
+    }
+    if (curr->left != nullptr){
+        curr = curr->left;
+        while (curr->right!=nullptr){
+            curr = curr->right;
+        }
+        return curr;
+    }
+    else {
+        Node* parent = curr->parent;
+        while (parent != nullptr && curr == parent->left) {
+            curr = parent;
+            parent = parent->parent;
+        }
+        return parent;
+    }
+    
 }
 
 // returns the predecessor value of the given value or 0 if there is none
 int IntBST::getPredecessor(int value) const{
-    return -1; // REPLACE THIS NON-SOLUTION
+    if (IntBST::getPredecessorNode(value) == nullptr){
+        return 0;
+    }
+    else {
+        return IntBST::getPredecessorNode(value)->info;
+    }
 }
 
 // returns the Node containing the successor of the given value
 IntBST::Node* IntBST::getSuccessorNode(int value) const{
-    return NULL; // REPLACE THIS NON-SOLUTION
+    Node* curr = getNodeFor(value, root);
+    if (curr == nullptr) {
+        return nullptr;
+    }
+    if (curr->right != nullptr){
+        curr = curr->right;
+        while (curr->left!=nullptr){
+            curr = curr->left;
+        }
+        return curr;
+    }
+    else {
+        Node* parent = curr->parent;
+        while (parent != nullptr && curr == parent->right) {
+            curr = parent;
+            parent = parent->parent;
+        }
+        return parent;
+    }
+    
 }
+
 
 // returns the successor value of the given value or 0 if there is none
 int IntBST::getSuccessor(int value) const{
-    return -1; // REPLACE THIS NON-SOLUTION
+    if (IntBST::getSuccessorNode(value) == nullptr){
+        return 0;
+    }
+    else {
+        return IntBST::getSuccessorNode(value)->info;
+    }
 }
 
 // deletes the Node containing the given value from the tree
 // returns true if the node exist and was deleted or false if the node does not exist
 bool IntBST::remove(int value){
-    return false; // REPLACE THIS NON-SOLUTION
+    if (IntBST::contains(value) == false) {
+        return false;
+    }
+    Node* n = getNodeFor(value, root);
+    if (n->right == nullptr && n->left == nullptr) {
+        if (n->parent == nullptr) {
+            delete n;
+            return true;
+        }
+        if (n->parent->right == n) {
+            n->parent->right = nullptr;
+            delete n;
+            return true;
+        }
+        if (n->parent->left == n) {
+            n->parent->left == nullptr;
+            delete n;
+            return true;
+        }
+    }
+    if (n->right == nullptr) {
+        if (n->parent == nullptr) {
+            n->left->parent = nullptr;
+            delete n;
+            return true;
+        }
+        if (n->parent->right == n) {
+            n->parent->right = n->left;
+            n->left->parent = n->parent;
+            delete n;
+            return true;
+        }
+        if (n->parent->left == n) {
+            n->parent->left = n->right;
+            n->right->parent = n->parent;
+            delete n;
+            return true;
+        }
+    }
 }
