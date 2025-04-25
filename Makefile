@@ -1,16 +1,20 @@
-# Makefile
-CXX_FLAG = --std=c++11 -g
-
-all: testbst
+#Makefile
+all: testbst test_intbst
 
 testbst: testbst.o intbst.o
-	g++ $(CXX_FLAG) -o testbst testbst.o intbst.o
+	$(CXX) $(CXX_FLAGS) testbst.o intbst.o -o testbst
 
-intbst.o: intbst.cpp
-	g++	-c $(CXX_FLAG) intbst.cpp
+test_intbst: test_intbst.o intbst.o
+	$(CXX) $(CXX_FLAGS) test_intbst.o intbst.o -o test_intbst
 
-testbst.o: testbst.cpp
-	g++	-c $(CXX_FLAG) testbst.cpp
+testbst.o: testbst.cpp intbst.h
+	$(CXX) -c $(CXX_FLAGS) testbst.cpp
+
+test_intbst.o: test_intbst.cpp intbst.h
+	$(CXX) -c $(CXX_FLAGS) test_intbst.cpp
+
+intbst.o: intbst.cpp intbst.h
+	$(CXX) -c $(CXX_FLAGS) intbst.cpp
 
 clean:
-	rm -f testbst *.o
+	rm -f testbst test_intbst *.o
