@@ -250,8 +250,10 @@ bool IntBST::remove(int value){
         return false;
     }
     Node* n = getNodeFor(value, root);
+
     if (n->right == nullptr && n->left == nullptr) {
         if (n->parent == nullptr) {
+            root = nullptr;
             delete n;
             return true;
         }
@@ -261,14 +263,15 @@ bool IntBST::remove(int value){
             return true;
         }
         if (n->parent->left == n) {
-            n->parent->left == nullptr;
+            n->parent->left = nullptr;
             delete n;
             return true;
         }
     }
     if (n->right == nullptr) {
         if (n->parent == nullptr) {
-            n->left->parent = nullptr;
+            root = n->left;
+            root->parent=nullptr;
             delete n;
             return true;
         }
@@ -282,6 +285,61 @@ bool IntBST::remove(int value){
             n->parent->left = n->right;
             n->right->parent = n->parent;
             delete n;
+            return true;
+        }
+        //predecessor of deletd node=swap value,one node tree, leaf node, one child, two children
+    }
+    if (n->left == nullptr) {
+        if (n->parent == nullptr) {
+            root = n->right;
+            root->parent=nullptr;
+            delete n;
+            return true;
+        }
+        if (n->parent->left == n) {
+            n->parent->left = n->left;
+            n->right->parent = n->parent;
+            delete n;
+            return true;
+        }
+        if (n->parent->right == n) {
+            n->parent->right = n->left;
+            n->left->parent = n->parent;
+            delete n;
+            return true;
+        }
+    }
+
+    if (n->left != nullptr && n->right != nullptr) {
+        int successor_val = getSuccessor(value);
+        Node* successor_node = getSuccessorNode(value);
+        if (n->parent == nullptr) {
+            int temp = root->info;
+            root->info = successor_val;
+            successor_node->info = temp; //switched w node
+            if (successor_node == successor_node->parent->right){
+                successor_node->parent->right = nullptr;
+            }
+            else{
+                successor_node->parent->left = nullptr;
+            }
+            delete successor_node;
+            return true;
+        }
+        if (n->parent->left == n) {
+            int temp = n->info;
+            n->info = successor_val;
+            successor_node->info = temp;
+            n->parent->left = nullptr;
+            delete successor_node;
+            return true;
+        }
+        if (n->parent->right == n) {
+            int temp = n->info;
+            n->info = successor_val;
+            successor_node->info = temp;
+            n->parent->right = nullptr;
+            delete successor_node;
             return true;
         }
     }
